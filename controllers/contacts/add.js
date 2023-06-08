@@ -1,20 +1,7 @@
-const Joi = require("joi");
 const { addContact } = require("../../models/contacts");
-
-const contactSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-});
 
 const add = async (req, res, next) => {
   try {
-    const { error } = contactSchema.validate(req.body);
-    if (error) {
-      error.status = 400;
-      throw error;
-    }
-
     const newContact = await addContact(req.body);
     if (newContact === null) {
       const error = new Error(
