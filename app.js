@@ -14,10 +14,12 @@ app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
 
+// Обработчик ошибок запроса
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
+// Глобальный обработчик ошибок
 app.use((err, req, res, next) => {
   const { status = 500, message = "Server error!!!" } = err;
   res.status(status).json({ message: err.message });
