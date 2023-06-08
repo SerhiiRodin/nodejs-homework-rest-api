@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-//Для валидации входящих данных Joi
+// Для валидации входящих данных Joi
 const { validation } = require("../../middlewares");
 const { contactSchema } = require("../../schemas");
 
