@@ -15,8 +15,8 @@ router.get("/:contactId", controllers.getById);
 // Вставляем валидацию, как middlewares перед работой контроллера
 router.post("/", validation(contactSchema), controllers.add);
 
-// Валидация в контроллере
-router.put("/:contactId", controllers.updateById);
+// Реалицация валидации в контроллере закоменчина
+router.put("/:contactId", validation(contactSchema), controllers.updateById);
 
 router.delete("/:contactId", controllers.removeById);
 
