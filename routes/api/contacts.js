@@ -1,25 +1,23 @@
-const express = require('express')
+const express = require("express");
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+// Для валидации входящих данных Joi
+const { validation } = require("../../middlewares");
+const { contactSchema } = require("../../schemas");
 
-router.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+const { contacts: controllers } = require("../../controllers");
 
-router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.get("/", controllers.getAllContacts);
 
-router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.get("/:contactId", controllers.getById);
 
-router.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+// Вставляем валидацию, как middlewares перед работой контроллера
+router.post("/", validation(contactSchema), controllers.add);
 
-module.exports = router
+// Реалицация валидации в контроллере закоменчина
+router.put("/:contactId", validation(contactSchema), controllers.updateById);
+
+router.delete("/:contactId", controllers.removeById);
+
+module.exports = router;
