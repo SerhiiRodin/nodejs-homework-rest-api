@@ -2,9 +2,11 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = require("./app");
-// const { DB_HOST } = require("./config")
-// Чтоб видить переменную на GITе и Render.com
+
 const { DB_HOST, PORT = 3000 } = process.env;
+
+// DB_HOST=mongodb+srv://Serhii:iFIiKHGhK5OzIP2q@cluster0.qvjk8qm.mongodb.net/db-contacts?retryWrites=true&w=majority
+// PORT=3000
 
 console.log(DB_HOST);
 
