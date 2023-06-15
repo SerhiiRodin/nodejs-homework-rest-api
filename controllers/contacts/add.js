@@ -1,5 +1,3 @@
-// const { addContact } = require("../../models/contacts");
-
 const { Contact } = require("../../models/");
 
 const add = async (req, res, next) => {

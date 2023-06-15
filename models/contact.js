@@ -39,7 +39,12 @@ const addJoiSchema = Joi.object({
   favorite: Joi.bool(),
 });
 
+const patchFavoriteJoiSchema = Joi.object({
+//   name: Joi.string().required(),
+  favorite: Joi.bool().required(),
+});
+
 // Создаем модель
 const Contact = model("contact", contactSchema);
 
-module.exports = { Contact, addJoiSchema };
+module.exports = { Contact, addJoiSchema, patchFavoriteJoiSchema };
