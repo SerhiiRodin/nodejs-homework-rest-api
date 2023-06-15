@@ -1,25 +1,36 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
+const { handleMongooseError } = require("../middlewares");
+
 // Создаем схему
-const contactSchema = new Schema({
-  name: {
-    type: String,
-    required: [true, "Set name for contact"],
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Set field 'name' for contact"],
+    },
+    email: {
+      type: String,
+      required: [true, "Set field 'email' for contact"],
+      //   Если поле должно быть уникальным
+      unique: true,
+    },
+    phone: {
+      type: String,
+      required: [true, "Set field 'phone' for contact"],
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
   },
-  email: {
-    type: String,
-    //   Если поле должно быть уникальным
-    // unique: [true, "This e-mail is already in the database"],
-  },
-  phone: {
-    type: String,
-  },
-  favorite: {
-    type: Boolean,
-    default: false,
-  },
-});
+  { versionKey: false, timestamps: true }
+);
+
+// Чтоб ошибки которые ловит mongoose схема имели статус создаем middleware.
+// Если mongoose схема выдает ошибку, то срабатывает эта middleware, присваивается статус 400
+contactSchema.post("save", handleMongooseError);
 
 const joiSchema = Joi.object({
   name: Joi.string().required(),

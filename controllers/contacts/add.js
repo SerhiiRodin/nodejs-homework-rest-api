@@ -1,15 +1,20 @@
-const { addContact } = require("../../models/contacts");
+// const { addContact } = require("../../models/contacts");
+
+const { Contact } = require("../../models/");
 
 const add = async (req, res, next) => {
   try {
-    const newContact = await addContact(req.body);
-    if (newContact === null) {
+    const existingContact = await Contact.findOne({ email: req.body.email });
+
+    if (existingContact) {
       const error = new Error(
-        `Contact with name:'${req.body.name}' or email:'${req.body.email}' already have.`
+        `Contact with email:'${req.body.email}' already have.`
       );
       error.status = 400;
       throw error;
     }
+
+    const newContact = await Contact.create(req.body);
     res.status(201).json(newContact);
   } catch (error) {
     next(error);
