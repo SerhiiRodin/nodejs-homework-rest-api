@@ -32,7 +32,7 @@ const contactSchema = new Schema(
 // Если mongoose схема выдает ошибку, то срабатывает эта middleware, присваивается статус 400
 contactSchema.post("save", handleMongooseError);
 
-const joiSchema = Joi.object({
+const addJoiSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().required(),
   phone: Joi.string().required(),
@@ -42,4 +42,4 @@ const joiSchema = Joi.object({
 // Создаем модель
 const Contact = model("contact", contactSchema);
 
-module.exports = { Contact, joiSchema };
+module.exports = { Contact, addJoiSchema };
