@@ -12,7 +12,6 @@ const {
 } = require("../../models/contact");
 
 const { contacts: controllers } = require("../../controllers");
-const updateByIdFavorite = require("../../controllers/contacts/updateByIdFavorite");
 
 router.get("/", controllers.getAllContacts);
 

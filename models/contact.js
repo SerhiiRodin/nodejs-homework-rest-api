@@ -14,7 +14,7 @@ const contactSchema = new Schema(
       type: String,
       required: [true, "Set field 'email' for contact"],
       //   Если поле должно быть уникальным
-      unique: true,
+      //   unique: true,
     },
     phone: {
       type: String,
@@ -40,7 +40,6 @@ const addJoiSchema = Joi.object({
 });
 
 const patchFavoriteJoiSchema = Joi.object({
-//   name: Joi.string().required(),
   favorite: Joi.bool().required(),
 });
 
