@@ -11,7 +11,7 @@ const {
   patchFavoriteJoiSchema,
 } = require("../../models/contact");
 
-const { contacts: controllers } = require("../../controllers");
+const controllers = require("../../controllers/contacts");
 
 router.get("/", controllers.getAllContacts);
 
