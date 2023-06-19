@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { isValidId } = require("../../middlewares");
+const { isValidId, validateFavorite } = require("../../middlewares");
 
 // Для валидации входящих данных Joi
 const { validation } = require("../../middlewares");
@@ -32,6 +32,7 @@ router.delete("/:contactId", isValidId, controllers.removeById);
 router.patch(
   "/:contactId/favorite",
   isValidId,
+  validateFavorite,
   validation(patchFavoriteJoiSchema),
   controllers.updateByIdFavorite
 );
