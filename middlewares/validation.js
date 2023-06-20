@@ -1,12 +1,12 @@
 const validation = (schema) => {
   return (req, res, next) => {
-    const { name, email, phone } = req.body;
     const { error } = schema.validate(req.body);
 
-    if (!name && !email && !phone) {
+    if (Object.keys(req.body).length === 0) {
       error.status = 400;
       error.message = "Missing fields";
       next(error);
+      return;
     }
 
     if (error) {
