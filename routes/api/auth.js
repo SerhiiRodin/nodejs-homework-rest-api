@@ -11,6 +11,7 @@ const controllers = require("../../controllers/auth");
 // signup
 router.post("/register", validation(registerJoiSchema), controllers.register);
 
-// signup
+// signin
+router.post("/login", validation(loginJoiSchema), controllers.login);
 
 module.exports = router;

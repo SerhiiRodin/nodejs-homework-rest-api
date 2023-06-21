@@ -1,10 +1,9 @@
 const handleMongooseError = (error, data, next) => {
   const { name, code } = error;
 
-  // Обр. ошибки Mongoose, что такой Email есть в БД.
+  // Добавляем статус 409, если поля unique: true повторяются.
   if (name === "MongoServerError" && code === 11000) {
     error.status = 409;
-    error.message = "Email in use";
     next(error);
     return;
   }
