@@ -2,7 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 
-const { isValidId, validateFavorite } = require("../../middlewares");
+const {
+  isValidId,
+  validateFavorite,
+  authenticate,
+} = require("../../middlewares");
 
 // Для валидации входящих данных Joi
 const { validation } = require("../../middlewares");
@@ -13,7 +17,7 @@ const {
 
 const controllers = require("../../controllers/contacts");
 
-router.get("/", controllers.getAllContacts);
+router.get("/", authenticate, controllers.getAllContacts);
 
 router.get("/:contactId", isValidId, controllers.getById);
 
