@@ -25,6 +25,8 @@ const authenticate = async (req, res, next) => {
       error.status = 401;
       next(error);
     }
+    // Записываем в req информацию про user-а
+    req.user = user;
   } catch {
     const error = new Error(`Not authorized`);
     error.status = 401;

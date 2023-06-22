@@ -2,17 +2,21 @@ const { Contact } = require("../models");
 
 const add = async (req, res, next) => {
   try {
-    const existingContact = await Contact.findOne({ email: req.body.email });
+    // // Проверка уникальности по email
+    // const existingContact = await Contact.findOne({ email: req.body.email });
 
-    if (existingContact) {
-      const error = new Error(
-        `Contact with email:'${req.body.email}' already have.`
-      );
-      error.status = 400;
-      throw error;
-    }
+    // if (existingContact) {
+    //   const error = new Error(
+    //     `Contact with email:'${req.body.email}' already have.`
+    //   );
+    //   error.status = 400;
+    //   throw error;
+    // }
 
-    const newContact = await Contact.create(req.body);
+    // Достаем user-a который делает запрос с поля req.user которое создали в миделваре authenticate
+    const { _id: owner } = req.user;
+
+    const newContact = await Contact.create({ ...req.body, owner });
     res.status(201).json(newContact);
   } catch (error) {
     next(error);
@@ -21,8 +25,9 @@ const add = async (req, res, next) => {
 };
 
 const getAllContacts = async (req, res, next) => {
+  const { _id: owner } = req.user;
   try {
-    const contacts = await Contact.find({}, "-createdAt -updatedAt");
+    const contacts = await Contact.find({ owner }, "-createdAt -updatedAt");
     res.status(200).json(contacts);
   } catch (error) {
     next(error);
