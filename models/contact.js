@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const { handleMongooseError } = require("../middlewares");
+const  handleMongooseError  = require("../middlewares/handleMongooseError");
 
 // Создаем схему
 const contactSchema = new Schema(

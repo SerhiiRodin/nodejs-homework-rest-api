@@ -19,22 +19,24 @@ const controllers = require("../../controllers/contacts");
 
 router.get("/", authenticate, controllers.getAllContacts);
 
-router.get("/:contactId", isValidId, controllers.getById);
+router.get("/:contactId", authenticate, isValidId, controllers.getById);
 
 // Вставляем валидацию, как middlewares перед работой контроллера
-router.post("/", validation(addJoiSchema), controllers.add);
+router.post("/", authenticate, validation(addJoiSchema), controllers.add);
 
 router.put(
   "/:contactId",
+  authenticate,
   isValidId,
   validation(addJoiSchema),
   controllers.updateById
 );
 
-router.delete("/:contactId", isValidId, controllers.removeById);
+router.delete("/:contactId", authenticate, isValidId, controllers.removeById);
 
 router.patch(
   "/:contactId/favorite",
+  authenticate,
   isValidId,
   validateFavorite,
   validation(patchFavoriteJoiSchema),

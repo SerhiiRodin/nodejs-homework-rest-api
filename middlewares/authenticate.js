@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// const { User } = require("../models");
-
+const { User } = require("../models");
 
 const { SECRET_KEY } = process.env;
 
@@ -20,12 +19,12 @@ const authenticate = async (req, res, next) => {
 
   try {
     const { id } = jwt.verify(token, SECRET_KEY);
-    // const user = await User.findById(id);
-    // if (!user) {
-    //   const error = new Error(`Not authorized`);
-    //   error.status = 401;
-    //   next(error);
-    // }
+    const user = await User.findById(id);
+    if (!user) {
+      const error = new Error(`Not authorized`);
+      error.status = 401;
+      next(error);
+    }
   } catch {
     const error = new Error(`Not authorized`);
     error.status = 401;
