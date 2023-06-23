@@ -27,18 +27,37 @@ const add = async (req, res, next) => {
 const getAllContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
   // Вытаскиваем параметры из строки запроса
-  const { favorite } = req.query;
+  const { favorite, page = 1, limit = 5 } = req.query;
+
+  // total-всего эл, limit-по сколько даем на странице, skip-сколько пропустить страниц
+  const paginationPage = +page;
+  const paginationLimit = +limit;
+  const skip = (paginationPage - 1) * paginationLimit;
 
   const favoriteOptions = favorite
     ? { $and: [{ owner }, { favorite }] }
     : { owner };
 
   try {
-    const contacts = await Contact.find(
-      favoriteOptions,
-      "-createdAt -updatedAt"
-    );
-    res.status(200).json(contacts);
+    // Сначало делает find =>
+    // sort по полю name "-name" сортировку от большего к меньшему от Я...А "name" от меньшего к большему от А...Я
+    // потом пагинация skip, limit
+    const contact = await Contact.find(favoriteOptions, "-createdAt -updatedAt")
+      .sort("-name")
+      .skip(skip)
+      .limit(paginationLimit);
+    // кол. элементов с фильтром favoriteOptions
+    const total = await Contact.count(favoriteOptions);
+
+    // Можно делать поэтапно
+    // const contactsQuery = Contact.find(
+    //   favoriteOptions,
+    //   "-createdAt -updatedAt"
+    // );
+    // contactsQuery.sort("-name");
+    // const contact = await contactsQuery;
+
+    res.status(200).json({ contact, total });
   } catch (error) {
     next(error);
     // res.status(500).json({ message: "Server error!!!" });
