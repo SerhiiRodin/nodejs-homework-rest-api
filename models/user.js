@@ -1,10 +1,12 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const  handleMongooseError  = require("../middlewares/handleMongooseError");
+const handleMongooseError = require("../middlewares/handleMongooseError");
 
 // Регулярное выраж. для email
 // const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+const subscriptionList = ["starter", "pro", "business"];
 
 const userSchema = new Schema(
   {
@@ -21,7 +23,7 @@ const userSchema = new Schema(
     },
     subscription: {
       type: String,
-      enum: ["starter", "pro", "business"],
+      enum: subscriptionList,
       default: "starter",
     },
     token: {
@@ -39,7 +41,7 @@ const registerJoiSchema = Joi.object({
   password: Joi.string().min(3).required(),
   //   email: Joi.string().pattern(emailRegexp).required(),
   email: Joi.string().required(),
-  subscription: Joi.string().valid("starter", "pro", "business"),
+  subscription: Joi.string().valid(...subscriptionList),
   token: Joi.string(),
 });
 
@@ -49,6 +51,17 @@ const loginJoiSchema = Joi.object({
   email: Joi.string().required(),
 });
 
+const subscriptionJoiSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...subscriptionList)
+    .required(),
+});
+
 const User = model("user", userSchema);
 
-module.exports = { User, registerJoiSchema, loginJoiSchema };
+module.exports = {
+  User,
+  registerJoiSchema,
+  loginJoiSchema,
+  subscriptionJoiSchema,
+};

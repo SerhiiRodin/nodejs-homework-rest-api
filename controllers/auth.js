@@ -122,4 +122,28 @@ const current = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout, current };
+const updateSubscription = async (req, res, next) => {
+  const { subscription } = req.body;
+  const { _id } = req.user;
+  try {
+    const user = await User.findByIdAndUpdate(
+      _id,
+      { subscription },
+      {
+        new: true,
+      }
+    );
+
+    if (!user) {
+      const error = new Error(`Not authorized`);
+      error.status = 401;
+      throw error;
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, logout, current, updateSubscription };
