@@ -8,10 +8,16 @@ const { registerJoiSchema, loginJoiSchema } = require("../../models/user");
 
 const controllers = require("../../controllers/auth");
 
-// signup
+const {authenticate} = require("../../middlewares")
+
+// signup - registration
 router.post("/register", validation(registerJoiSchema), controllers.register);
 
-// signin
+// signin - login
 router.post("/login", validation(loginJoiSchema), controllers.login);
+
+// logout
+router.post("/logout", authenticate, controllers.logout);
+
 
 module.exports = router;

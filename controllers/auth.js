@@ -59,6 +59,12 @@ const login = async (req, res, next) => {
 
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
 
+    // Записываем поле токен у user-a и сохраняем изменеия в БД
+    // user.token = token;
+    //   await user.save();
+    // или
+    await User.findByIdAndUpdate(user._id, { token });
+
     res.status(200).json({
       token,
       user: {
@@ -71,4 +77,28 @@ const login = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login };
+const logout = async (req, res, next) => {
+  const { _id } = req.user;
+  try {
+    const user = await User.findById(_id);
+
+    if (!user) {
+      const error = new Error(`Not authorized`);
+      error.status = 401;
+      throw error;
+    }
+
+    //       user.token = null;
+    //       await user.save()
+    // // или
+    await User.findByIdAndUpdate(_id, { token: null });
+
+    res.status(204).json();
+
+    // next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, logout };
