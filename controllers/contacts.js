@@ -26,8 +26,18 @@ const add = async (req, res, next) => {
 
 const getAllContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
+  // Вытаскиваем параметры из строки запроса
+  const { favorite } = req.query;
+
+  const favoriteOptions = favorite
+    ? { $and: [{ owner }, { favorite }] }
+    : { owner };
+
   try {
-    const contacts = await Contact.find({ owner }, "-createdAt -updatedAt");
+    const contacts = await Contact.find(
+      favoriteOptions,
+      "-createdAt -updatedAt"
+    );
     res.status(200).json(contacts);
   } catch (error) {
     next(error);
