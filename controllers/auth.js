@@ -62,7 +62,7 @@ const login = async (req, res, next) => {
     // Записываем поле токен у user-a и сохраняем изменеия в БД
     // user.token = token;
     //   await user.save();
-    // или
+    //  или
     await User.findByIdAndUpdate(user._id, { token });
 
     res.status(200).json({
@@ -90,7 +90,7 @@ const logout = async (req, res, next) => {
 
     //       user.token = null;
     //       await user.save()
-    // // или
+    //  или
     await User.findByIdAndUpdate(_id, { token: null });
 
     res.status(204).json();
@@ -101,4 +101,25 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout };
+const current = async (req, res, next) => {
+  try {
+    const { email, subscription, _id } = req.user;
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      const error = new Error(`Not authorized`);
+      error.status = 401;
+      throw error;
+    }
+
+    res.status(200).json({
+      email,
+      subscription,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, logout, current };
