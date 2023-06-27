@@ -57,7 +57,7 @@ const login = async (req, res, next) => {
     };
     const { SECRET_KEY } = process.env;
 
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "120h" });
 
     // Записываем поле токен у user-a и сохраняем изменеия в БД
     // user.token = token;
