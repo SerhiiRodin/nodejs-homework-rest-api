@@ -1,5 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
 require("dotenv").config();
 
 const { User } = require("../models");
@@ -16,8 +19,15 @@ const register = async (req, res, next) => {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
+    //  Дает путь к временной аватарке
+    const avatarURL = gravatar.url(email);
 
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const newUser = await User.create({
+      ...req.body,
+      password: hashPassword,
+      //   avatarURL,
+      avatarURL: `${avatarURL}?d=monsterid`,
+    });
 
     res.status(201).json({
       user: {
@@ -146,4 +156,35 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout, current, updateSubscription };
+const updateAvatar = async (req, res, next) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  try {
+    //   Создаем уникальное имя
+    const filename = `${_id}_${originalname}`;
+
+    // Путь куда запимываем аватарку и под каким именем
+    const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+    const resultUpload = path.join(avatarsDir, filename);
+
+    // Перемещаем с temp public/avatars
+    await fs.rename(tempUpload, resultUpload);
+    // Создаем путь к аватарке
+    const avatarURL = path.join("avatars", filename);
+    // Запимываем путь в поле юзера
+    await User.findByIdAndUpdate(_id, { avatarURL });
+    res.status(200).json({ avatarURL });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  current,
+  updateSubscription,
+  updateAvatar,
+};
