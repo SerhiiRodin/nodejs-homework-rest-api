@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
+const Jimp = require("jimp");
+
 require("dotenv").config();
 
 const { User } = require("../models");
@@ -26,7 +28,7 @@ const register = async (req, res, next) => {
       ...req.body,
       password: hashPassword,
       //   avatarURL,
-      avatarURL: `${avatarURL}?d=monsterid`,
+      avatarURL: `${avatarURL}?s=250&d=retro`,
     });
 
     res.status(201).json({
@@ -168,8 +170,14 @@ const updateAvatar = async (req, res, next) => {
     const avatarsDir = path.join(__dirname, "../", "public", "avatars");
     const resultUpload = path.join(avatarsDir, filename);
 
-    // Перемещаем с temp public/avatars
-    await fs.rename(tempUpload, resultUpload);
+    // // Перемещаем с temp public/avatars
+    // await fs.rename(tempUpload, resultUpload);
+    // // Меняем размер с помощью Jimp и сохраняем public/avatars
+    const avatar = await Jimp.read(tempUpload);
+    await avatar.resize(250, 250).quality(90).write(resultUpload);
+
+    //  Удаляем в папке temp файл
+    await fs.unlink(tempUpload);
     // Создаем путь к аватарке
     const avatarURL = path.join("avatars", filename);
     // Запимываем путь в поле юзера
