@@ -3,6 +3,7 @@ const handleMongooseError = require("./handleMongooseError");
 const isValidId = require("./isValidId");
 const validateFavorite = require("./validateFavorite");
 const authenticate = require("./authenticate");
+const upload = require("./upload");
 
 module.exports = {
   validation,
@@ -10,4 +11,5 @@ module.exports = {
   isValidId,
   validateFavorite,
   authenticate,
+  upload,
 };

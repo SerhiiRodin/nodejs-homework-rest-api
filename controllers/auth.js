@@ -1,5 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
+
 require("dotenv").config();
 
 const { User } = require("../models");
@@ -16,8 +21,15 @@ const register = async (req, res, next) => {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
+    //  Дает путь к временной аватарке
+    const avatarURL = gravatar.url(email);
 
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const newUser = await User.create({
+      ...req.body,
+      password: hashPassword,
+      //   avatarURL,
+      avatarURL: `${avatarURL}?s=250&d=retro`,
+    });
 
     res.status(201).json({
       user: {
@@ -57,7 +69,7 @@ const login = async (req, res, next) => {
     };
     const { SECRET_KEY } = process.env;
 
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "120h" });
 
     // Записываем поле токен у user-a и сохраняем изменеия в БД
     // user.token = token;
@@ -146,4 +158,41 @@ const updateSubscription = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout, current, updateSubscription };
+const updateAvatar = async (req, res, next) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  try {
+    //   Создаем уникальное имя
+    const filename = `${_id}_${originalname}`;
+
+    // Путь куда запимываем аватарку и под каким именем
+    const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+    const resultUpload = path.join(avatarsDir, filename);
+
+    // // Перемещаем с temp public/avatars
+    // await fs.rename(tempUpload, resultUpload);
+    // // Меняем размер с помощью Jimp и сохраняем public/avatars
+    const avatar = await Jimp.read(tempUpload);
+    await avatar.resize(250, 250).quality(90).write(resultUpload);
+
+    //  Удаляем в папке temp файл
+    await fs.unlink(tempUpload);
+    // Создаем путь к аватарке
+    const avatarURL = path.join("avatars", filename);
+    // Запимываем путь в поле юзера
+    await User.findByIdAndUpdate(_id, { avatarURL });
+    res.status(200).json({ avatarURL });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  current,
+  updateSubscription,
+  updateAvatar,
+};

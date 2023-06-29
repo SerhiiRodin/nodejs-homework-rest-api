@@ -14,6 +14,9 @@ const controllers = require("../../controllers/auth");
 
 const { authenticate } = require("../../middlewares");
 
+const { upload } = require("../../middlewares");
+// const  upload  = require("../../middlewares/upload");
+
 // signup - registration
 router.post("/register", validation(registerJoiSchema), controllers.register);
 
@@ -32,6 +35,14 @@ router.patch(
   authenticate,
   validation(subscriptionJoiSchema),
   controllers.updateSubscription
+);
+
+// avatar change
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  controllers.updateAvatar
 );
 
 module.exports = router;
