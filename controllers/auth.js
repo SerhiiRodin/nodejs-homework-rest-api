@@ -4,6 +4,11 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const { v4: uuidv4 } = require("uuid");
+
+const nodemailer = require("nodemailer");
+
+const sendMail = require("../helpers/sendEmail");
 
 require("dotenv").config();
 
@@ -23,13 +28,28 @@ const register = async (req, res, next) => {
     const hashPassword = await bcrypt.hash(password, 10);
     //  Дает путь к временной аватарке
     const avatarURL = gravatar.url(email);
+    const verificationToken = uuidv4();
 
     const newUser = await User.create({
       ...req.body,
       password: hashPassword,
       //   avatarURL,
       avatarURL: `${avatarURL}?s=250&d=retro`,
+      verificationToken,
     });
+    // Отправка письма
+    const { BASE_URL, META_PASSWORD } = process.env;
+
+
+    const verifyEmail = {
+      from: "rodinserj@meta.ua",
+      to: email,
+      subject: "Verify email",
+      // text: " Тест отправки письма.",
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+    };
+
+    await sendMail(verifyEmail);
 
     res.status(201).json({
       user: {
