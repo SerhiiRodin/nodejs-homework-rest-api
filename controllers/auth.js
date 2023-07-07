@@ -11,6 +11,7 @@ const sendEmail = require("../helpers/sendEmail");
 require("dotenv").config();
 
 const { User } = require("../models");
+const { error } = require("console");
 
 const register = async (req, res, next) => {
   const { email, password } = req.body;
@@ -75,6 +76,43 @@ const verify = async (req, res, next) => {
     });
 
     res.status(200).json({ message: "Verification successful" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resendVerify = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      const error = new Error("Not authorized");
+      error.status = 401;
+      throw error;
+    }
+
+    if (user.verify) {
+      const error = new Error("Verification has already been passed");
+      error.status = 400;
+      throw error;
+    }
+
+    // Повторная отправка письма
+    const { BASE_URL } = process.env;
+
+    const verifyEmail = {
+      to: email,
+      subject: "Verify email",
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">Click verify email</a>`,
+    };
+
+    await sendEmail(verifyEmail);
+
+    res.status(200).json({
+      message: "Verification email sent",
+    });
+    
   } catch (error) {
     next(error);
   }
@@ -241,4 +279,5 @@ module.exports = {
   updateSubscription,
   updateAvatar,
   verify,
+  resendVerify,
 };
