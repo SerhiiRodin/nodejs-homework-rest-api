@@ -20,6 +20,9 @@ const { upload } = require("../../middlewares");
 // signup - registration
 router.post("/register", validation(registerJoiSchema), controllers.register);
 
+// verification
+router.get("/verify/:verificationToken", controllers.verify);
+
 // signin - login
 router.post("/login", validation(loginJoiSchema), controllers.login);
 

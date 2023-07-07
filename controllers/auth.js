@@ -6,9 +6,7 @@ const fs = require("fs/promises");
 const Jimp = require("jimp");
 const { v4: uuidv4 } = require("uuid");
 
-const nodemailer = require("nodemailer");
-
-const sendMail = require("../helpers/sendEmail");
+const sendEmail = require("../helpers/sendEmail");
 
 require("dotenv").config();
 
@@ -38,18 +36,15 @@ const register = async (req, res, next) => {
       verificationToken,
     });
     // Отправка письма
-    const { BASE_URL, META_PASSWORD } = process.env;
-
+    const { BASE_URL } = process.env;
 
     const verifyEmail = {
-      from: "rodinserj@meta.ua",
       to: email,
       subject: "Verify email",
-      // text: " Тест отправки письма.",
       html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
     };
 
-    await sendMail(verifyEmail);
+    await sendEmail(verifyEmail);
 
     res.status(201).json({
       user: {
@@ -57,6 +52,29 @@ const register = async (req, res, next) => {
         subscription: newUser.subscription,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verify = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+
+    const user = await User.findOne({ verificationToken });
+
+    if (!user || user === null) {
+      const error = new Error(`User not found`);
+      error.status = 404;
+      throw error;
+    }
+
+    await User.findByIdAndUpdate(user._id, {
+      verify: true,
+      verificationToken: null,
+    });
+
+    res.status(200).json({ message: "Verification successful" });
   } catch (error) {
     next(error);
   }
@@ -70,6 +88,13 @@ const login = async (req, res, next) => {
 
     if (!user) {
       const error = new Error(`Email or password is wrong`);
+      error.status = 401;
+      throw error;
+    }
+
+    // Проверяем verify
+    if (!user.verify || user.verify === null) {
+      const error = new Error(`Not authorized`);
       error.status = 401;
       throw error;
     }
@@ -215,4 +240,5 @@ module.exports = {
   current,
   updateSubscription,
   updateAvatar,
+  verify,
 };
