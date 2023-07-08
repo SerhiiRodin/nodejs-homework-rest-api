@@ -8,6 +8,7 @@ const {
   registerJoiSchema,
   loginJoiSchema,
   subscriptionJoiSchema,
+  userEmailVerifyJoiSchema,
 } = require("../../models/user");
 
 const controllers = require("../../controllers/auth");
@@ -19,6 +20,16 @@ const { upload } = require("../../middlewares");
 
 // signup - registration
 router.post("/register", validation(registerJoiSchema), controllers.register);
+
+// verification Email
+router.get("/verify/:verificationToken", controllers.verify);
+
+// resend verification Email
+router.post(
+  "/verify",
+  validation(userEmailVerifyJoiSchema),
+  controllers.resendVerify
+);
 
 // signin - login
 router.post("/login", validation(loginJoiSchema), controllers.login);
